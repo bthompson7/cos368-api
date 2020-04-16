@@ -5,18 +5,13 @@ from twisted.web.proxy import ReverseProxyResource
 from twisted.web.resource import Resource
 from twisted.web.server import Site
 from twisted.web.wsgi import WSGIResource
-import os.path
 import numpy as np
-import keras
 from keras.models import load_model
 from skimage.io import imread
 from skimage.transform import resize
-import json
-import re
+import json,re,h5py,base64,keras
 from io import BytesIO
 from PIL import Image
-import base64
-import h5py
 
 app = Flask(__name__)
 #app.config["DEBUG"] = True
@@ -26,14 +21,18 @@ def page_not_found(e):
     return jsonify(error="Resource not found"), 404
 
 '''
+Attempts to guess the insect in an image
 
-returns a json representation of the guess
-example:
+    Returns:
+        the guess in json
 
-{
-  "img_guess": "Beetle"
-}
+Make sure to send the api an image in base64 and then turn that into json so that
+the api can read it
 
+Then it would return:
+
+200 OK
+{"img_guess":"Hornworm"}
 
 '''
 
@@ -45,7 +44,7 @@ def detectInsect():
 	class_labels = {0: 'Hornworm', 1: 'Beetle'}
 	model = load_model('insect_model.h5') #the model can detect Hornworms and Beetles for now
 	print("reading image...")
-	image_to_test = 'beetle_api_test.jpg'
+	image_to_test = 'image_to_test.jpg'
 	with open(image_to_test, "wb") as fh:
 		 fh.write(base64.decodebytes(image_bytes))
 
