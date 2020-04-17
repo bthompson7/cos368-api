@@ -35,14 +35,14 @@ Then it would return:
 {"img_guess":"Hornworm","is_pest":"yes"}
 
 '''
-pests = ["Hornworm","Beetle"]
+pests = ["Hornworm","Japanese Beetle","Browntail Moth"]
 @app.route('/detect', methods=['POST'])
 def detectInsect():
 	image_data = request.form['img']
 	image_bytes = str.encode(image_data)
 	type(image_bytes)
-	class_labels = {0: 'Hornworm', 1: 'Beetle'}
-	model = load_model('insect_model.h5') #the model can detect Hornworms and Beetles for now
+	class_labels = {0: 'Browntail Moth', 1: 'Hornworm',2: 'Japanese Beetle', 3:'Ladybug'}
+	model = load_model('insect_model2.h5') #the model can detect Hornworms and Beetles for now
 	print("reading image...")
 	image_to_test = 'image_to_test.jpg'
 	with open(image_to_test, "wb") as fh:
@@ -54,7 +54,7 @@ def detectInsect():
 	if(np.max(img)>1):
     		img = img/255.0
 	pred = model.predict_classes(img,verbose=1)
-	guess = class_labels[pred[0][0]]
+	guess = class_labels[pred[0]]
 	print("I think its a %s"%guess)
 
 	is_pest = 'no'
