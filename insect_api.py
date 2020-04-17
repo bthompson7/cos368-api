@@ -32,10 +32,10 @@ the api can read it
 Then it would return:
 
 200 OK
-{"img_guess":"Hornworm"}
+{"img_guess":"Hornworm","is_pest":"yes"}
 
 '''
-
+pests = ["Hornworm","Beetle"]
 @app.route('/detect', methods=['POST'])
 def detectInsect():
 	image_data = request.form['img']
@@ -56,7 +56,12 @@ def detectInsect():
 	pred = model.predict_classes(img,verbose=1)
 	guess = class_labels[pred[0][0]]
 	print("I think its a %s"%guess)
-	return jsonify(img_guess=guess)
+
+	is_pest = 'no'
+	for insect in pests:
+		if guess == insect:
+			is_pest = 'yes'
+	return jsonify(img_guess=guess,is_pest=is_pest)
 
 resource = WSGIResource(reactor, reactor.getThreadPool(), app)
 site = Site(resource)
